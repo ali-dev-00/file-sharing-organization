@@ -102,10 +102,7 @@ export default function Home() {
         }}
           >
           <DialogTrigger asChild >
-            <Button onClick={() => {
-
-
-            }}>
+            <Button>
               Upload File
             </Button>
           </DialogTrigger>
