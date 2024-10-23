@@ -3,7 +3,7 @@
 import { useOrganization, useUser } from "@clerk/clerk-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { UploadBtn } from "./Upload_btn";
+import { UploadBtn } from "./UploadBtn";
 import { FileCard } from "./FileCard";
 
 
