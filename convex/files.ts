@@ -11,7 +11,7 @@ export const generateUploadUrl = mutation(async (ctx) => {
         throw new ConvexError('you must be login to create files')
     }
     return await ctx.storage.generateUploadUrl();
-  });
+});
 
 
 async function hasAccessToOrg(
@@ -27,9 +27,9 @@ async function hasAccessToOrg(
 export const createFile = mutation({
     args: {
         name: v.string(),
-        fileId : v.id("_storage"),
+        fileId: v.id("_storage"),
         orgId: v.string(),
-        type : fileTypes
+        type: fileTypes
     },
 
     async handler(ctx, args) {
@@ -45,9 +45,9 @@ export const createFile = mutation({
         }
         await ctx.db.insert('files', {
             name: args.name,
-            orgId: args.orgId,     
-            fileId : args.fileId,
-            type : args.type,
+            orgId: args.orgId,
+            fileId: args.fileId,
+            type: args.type,
         });
     }
 });
@@ -55,6 +55,7 @@ export const createFile = mutation({
 export const getFiles = query({
     args: v.object({
         orgId: v.string(),
+        query: v.optional(v.string()),
     }),
     async handler(ctx, args) {
         const identity = await ctx.auth.getUserIdentity();
@@ -65,15 +66,23 @@ export const getFiles = query({
         if (!hasAccess) {
             return [];
         }
-        return ctx.db.query("files")
+        const files = await ctx.db.query("files")
             .withIndex('by_orgId', (q) => q.eq('orgId', args.orgId))
             .collect();
+
+        const query = args.query;
+        if(query){
+            return files.filter(file => file.name.toLowerCase().includes(query.toLowerCase()))
+        }else{
+            return files;
+        }
+        
     }
 });
 
 export const deleteFile = mutation({
-    args: {fileId : v.id("files")},
-    async handler(ctx ,args){
+    args: { fileId: v.id("files") },
+    async handler(ctx, args) {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
             throw new ConvexError("You do not have access to this organization")
@@ -95,13 +104,13 @@ export const deleteFile = mutation({
 
 
 export const getFilesWithUrls = query({
-    args: {}, 
+    args: {},
     handler: async (ctx) => {
         const files = await ctx.db.query("files").collect();
         const filesWithUrl = await Promise.all(
             files.map(async (file) => ({
                 ...file,
-                url: await ctx.storage.getUrl(file.fileId), 
+                url: await ctx.storage.getUrl(file.fileId),
             }))
         );
 
