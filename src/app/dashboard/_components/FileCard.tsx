@@ -14,7 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarIcon, TextIcon, TrashIcon, TypeIcon } from "lucide-react"
+import { FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarHalfIcon, StarIcon, TextIcon, TrashIcon, TypeIcon } from "lucide-react"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -32,11 +32,11 @@ import { api } from "../../../../convex/_generated/api";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 
-function FileCardActions({ file }: { file: Doc<"files"> }) {
+function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorited: boolean }) {
     const { toast } = useToast();
-    
+
     const toggleFavorite = useMutation(api.files.toggleFavorite)
-    
+
     const deleteFile = useMutation(api.files.deleteFile);
 
 
@@ -73,11 +73,20 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
                 <DropdownMenuTrigger><MoreVertical /></DropdownMenuTrigger>
                 <DropdownMenuContent  >
                     <DropdownMenuItem onClick={() => {
-                  toggleFavorite({fileId:file._id})
+                        toggleFavorite({ fileId: file._id })
                     }} className="flex gap-1items-center cursor-pointer">
-                        <StarIcon className="w-4 h-4" /> Favorites
+                        {isFavorited ? (
+                            <div className="flex gap-1 items-center" >
+                                <StarHalfIcon className="w-4 h-4" />  Unfavorite
+                            </div>
+                        ) : (
+                            <div className="flex gap-1 items-center" >
+                                <StarIcon className="w-4 h-4" />Favorite
+                            </div>
+                        )}
+                       
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator/>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => {
                         setisConfirmOpen(true)
                     }} className="flex gap-1 text-red-600 items-center cursor-pointer">
@@ -89,7 +98,7 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
     )
 }
 
-export function FileCard({ file }: { file: Doc<"files"> }) {
+export function FileCard({ file, favorites }: { file: Doc<"files">; favorites: Doc<"favorites">[] }) {
     const typeIcons = {
         image: <ImageIcon />,
         pdf: <FileTextIcon />,
@@ -100,6 +109,9 @@ export function FileCard({ file }: { file: Doc<"files"> }) {
 
     const fileWithUrl = fileUrl?.find(f => f.fileId === file.fileId);
 
+    const isFavorited = favorites.some((favorite) => favorite.fileId === file._id)
+
+
     return (
         <Card>
             <CardHeader className="relative">
@@ -107,13 +119,13 @@ export function FileCard({ file }: { file: Doc<"files"> }) {
                     {typeIcons[file.type]} {file.name}
                 </CardTitle>
                 <div className="absolute top-2 right-2">
-                    <FileCardActions file={file} />
+                    <FileCardActions isFavorited={isFavorited} file={file} />
                 </div>
             </CardHeader>
             <CardContent className="h-[150px] flex justify-center items-center ">
                 {fileWithUrl && file.type === 'image' && (
                     <Image
-                        src={fileWithUrl.url ?? "Loading"} 
+                        src={fileWithUrl.url ?? "Loading"}
                         alt={file.name}
                         width={200}
                         height={200}
@@ -121,21 +133,21 @@ export function FileCard({ file }: { file: Doc<"files"> }) {
                 )}
 
                 {file.type === "csv" && (
-                  <GanttChartIcon className="w-20 h-20" />
+                    <GanttChartIcon className="w-20 h-20" />
                 )}
                 {file.type === "pdf" && (
-                  <FileTextIcon className="w-20 h-20" />
+                    <FileTextIcon className="w-20 h-20" />
                 )}
             </CardContent>
             <CardFooter>
                 <Button
-               onClick={() => {
-                if (fileWithUrl && fileWithUrl.url) {
-                    window.open(fileWithUrl.url, "_blank"); // Ensure the URL is valid before opening
-                } else {
-                    alert("File URL not available.");
-                }
-            }}>
+                    onClick={() => {
+                        if (fileWithUrl && fileWithUrl.url) {
+                            window.open(fileWithUrl.url, "_blank"); // Ensure the URL is valid before opening
+                        } else {
+                            alert("File URL not available.");
+                        }
+                    }}>
                     Download
                 </Button>
             </CardFooter>

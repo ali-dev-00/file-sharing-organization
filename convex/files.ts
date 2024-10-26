@@ -16,12 +16,24 @@ export const generateUploadUrl = mutation(async (ctx) => {
 
 
 async function hasAccessToOrg(
-    ctx: QueryCtx | MutationCtx,
-    tokenIdentifier: string, orgId: string) {
-    const user = await getUser(ctx, tokenIdentifier);
-    const hasAccess = user.orgIds.includes(orgId) || user.tokenIdentifier.includes(orgId);
+    ctx: QueryCtx | MutationCtx, orgId: string) {
 
-    return hasAccess;
+
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+       return null;
+    }
+    const user = await ctx.db.query("users").withIndex('by_tokenIdentifier',
+        q => q.eq("tokenIdentifier", identity.tokenIdentifier)
+    ).first();
+    if (!user) {
+        return null;
+    }
+    const hasAccess = user.orgIds.includes(orgId) || user.tokenIdentifier.includes(orgId);
+    if (!hasAccess) {
+        return null;
+    }
+    return {user};
 }
 
 
@@ -34,13 +46,7 @@ export const createFile = mutation({
     },
 
     async handler(ctx, args) {
-
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-            throw new ConvexError('you must be login to create files')
-        }
-
-        const hasAccess = await hasAccessToOrg(ctx, identity.tokenIdentifier, args.orgId);
+        const hasAccess = await hasAccessToOrg(ctx,args.orgId);
         if (!hasAccess) {
             throw new ConvexError("you do not have access to this org")
         }
@@ -60,12 +66,9 @@ export const getFiles = query({
         favorites: v.optional(v.boolean()),
     }),
     async handler(ctx, args) {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-            return [];
-        }
-        const hasAccess = await hasAccessToOrg(ctx, identity.tokenIdentifier, args.orgId);
-        if (!hasAccess) {
+      
+        const access = await hasAccessToOrg(ctx, args.orgId);
+        if (!access) {
             return [];
         }
         let files = await ctx.db.query("files")
@@ -78,20 +81,13 @@ export const getFiles = query({
         }
 
         if (args.favorites) {
-            const user = await ctx.db.query("users").withIndex('by_tokenIdentifier', 
-                q => q.eq("tokenIdentifier", identity.tokenIdentifier)
-            ).first();
-            
-            if (!user) {
-                return files;
-            }
-            
+          
             const favorites = await ctx.db.query("favorites").withIndex("by_userId_orgId_fileId", q =>
-                q.eq("userId", user._id).eq("orgId", args.orgId)
+                q.eq("userId", access.user._id).eq("orgId", args.orgId)
             ).collect();
-            
+
             files = files.filter((file) => favorites.some((favorite) => favorite.fileId === file._id));
-            
+
         }
         return files;
     }
@@ -152,31 +148,39 @@ export const toggleFavorite = mutation({
 })
 
 
+export const getAllFavorites = query({
+    args: { orgId: v.string() },
+    async handler(ctx, args) {
+       
+        const access = await hasAccessToOrg(ctx, args.orgId)
+        if (!access) {
+            return []
+        }
+        const favorites = await ctx.db.query("favorites")
+            .withIndex('by_userId_orgId_fileId', q =>
+                q.eq('userId', access.user._id).eq("orgId", args.orgId)
+            ).collect();
+       
+            return favorites;
+
+    }
+})
+
+
 async function hasAccessToFile(
     ctx: QueryCtx | MutationCtx,
     fileId: Id<"files">
 ) {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-        return null;
-    }
-
     const file = await ctx.db.get(fileId);
     if (!file) {
         return null;
     }
 
-    const hasAccess = await hasAccessToOrg(ctx, identity.tokenIdentifier, file.orgId);
+    const hasAccess = await hasAccessToOrg(ctx, file.orgId);
     if (!hasAccess) {
         return null;
     }
 
-    const user = await ctx.db.query("users").withIndex('by_tokenIdentifier',
-        q => q.eq("tokenIdentifier", identity.tokenIdentifier)
-    ).first();
-    if (!user) {
-        return null;
-    }
 
-    return { file, user }
+    return { file, user : hasAccess.user }
 }

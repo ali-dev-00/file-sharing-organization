@@ -9,7 +9,7 @@ export default function FavoritesPage(){
     return(
         <>
          
-          <FileBrowser title={"Favorites"}  favorites/>
+          <FileBrowser title={"Favorites"} favoritesOnly/>
         </>
     )
-}``
+}
