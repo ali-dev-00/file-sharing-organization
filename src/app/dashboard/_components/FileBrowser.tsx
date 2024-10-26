@@ -29,7 +29,7 @@ function PlaceHolder() {
   )
 }
 
-export  function FileBrowser({title} : {title :string}) {
+export  function FileBrowser({title ,favorites } : {title :string , favorites?: boolean}) {
 
   const organization = useOrganization();
   const user = useUser();
@@ -42,7 +42,7 @@ export  function FileBrowser({title} : {title :string}) {
   }
 
   const files = useQuery(
-    api.files.getFiles, orgId ? { orgId, query } : "skip"
+    api.files.getFiles, orgId ? { orgId, query ,favorites} : "skip"
   );
   const isLoading = files === undefined
 
@@ -68,7 +68,7 @@ export  function FileBrowser({title} : {title :string}) {
                 <UploadBtn />
               </div>
 
-              {files.length === 0 &&
+              {files?.length === 0 &&
                 <PlaceHolder />
               }
 

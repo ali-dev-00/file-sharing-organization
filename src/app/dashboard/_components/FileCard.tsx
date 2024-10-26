@@ -11,9 +11,10 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, TextIcon, TrashIcon, TypeIcon } from "lucide-react"
+import { FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarIcon, TextIcon, TrashIcon, TypeIcon } from "lucide-react"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -33,7 +34,12 @@ import Image from "next/image";
 
 function FileCardActions({ file }: { file: Doc<"files"> }) {
     const { toast } = useToast();
+    
+    const toggleFavorite = useMutation(api.files.toggleFavorite)
+    
     const deleteFile = useMutation(api.files.deleteFile);
+
+
     const [isConfirmOpen, setisConfirmOpen] = useState(false)
     return (
         <>
@@ -67,8 +73,16 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
                 <DropdownMenuTrigger><MoreVertical /></DropdownMenuTrigger>
                 <DropdownMenuContent  >
                     <DropdownMenuItem onClick={() => {
+                  toggleFavorite({fileId:file._id})
+                    }} className="flex gap-1items-center cursor-pointer">
+                        <StarIcon className="w-4 h-4" /> Favorites
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem onClick={() => {
                         setisConfirmOpen(true)
-                    }} className="flex gap-1 text-red-600 items-center cursor-pointer"><TrashIcon className="w-4 h-4" /> Delete</DropdownMenuItem>
+                    }} className="flex gap-1 text-red-600 items-center cursor-pointer">
+                        <TrashIcon className="w-4 h-4" /> Delete
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </>
