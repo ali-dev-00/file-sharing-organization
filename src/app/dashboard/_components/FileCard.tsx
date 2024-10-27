@@ -14,6 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Protect } from '@clerk/nextjs'
 import { FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarHalfIcon, StarIcon, TextIcon, TrashIcon, TypeIcon } from "lucide-react"
 import {
     AlertDialog,
@@ -84,14 +85,20 @@ function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorite
                                 <StarIcon className="w-4 h-4" />Favorite
                             </div>
                         )}
-                       
+
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => {
-                        setisConfirmOpen(true)
-                    }} className="flex gap-1 text-red-600 items-center cursor-pointer">
-                        <TrashIcon className="w-4 h-4" /> Delete
-                    </DropdownMenuItem>
+
+                    <Protect
+                        role="org:admin"
+                        fallback={<></>}
+                    >
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => {
+                            setisConfirmOpen(true)
+                        }} className="flex gap-1 text-red-600 items-center cursor-pointer">
+                            <TrashIcon className="w-4 h-4" /> Delete
+                        </DropdownMenuItem>
+                    </Protect>
                 </DropdownMenuContent>
             </DropdownMenu>
         </>
