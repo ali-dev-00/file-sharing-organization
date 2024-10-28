@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { OrganizationSwitcher, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { OrganizationSwitcher, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { DoorOpenIcon, SquareArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,11 +15,13 @@ export default function Header() {
                         FileDrive
                     </Link>
                 </div>
-                <Link href="/dashboard/files">
-                    <Button variant="outline" >
-                        Start Managing Files <SquareArrowRight />
-                    </Button>
-                </Link>
+                <SignedIn>
+                    <Link href="/dashboard/files">
+                        <Button variant="outline" >
+                            Start Managing Files <SquareArrowRight />
+                        </Button>
+                    </Link>
+                </SignedIn>
                 <div className="flex gap-2">
                     <OrganizationSwitcher />
                     <UserButton />
