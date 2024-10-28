@@ -3,13 +3,17 @@ import { v } from "convex/values";
 
 export const fileTypes = v.union(v.literal("image"), v.literal("csv"),v.literal("pdf"));
 export const roles = v.union(v.literal("admin"),v.literal("member"));
+
 export default defineSchema({
+ 
   files: defineTable({
     name: v.string(),
     orgId: v.string(),
     type : fileTypes,
-    fileId: v.id("_storage")
-  }).index("by_orgId", ["orgId"]),
+    fileId: v.id("_storage"),
+    shouldDelete : v.optional(v.boolean())
+  }).index("by_orgId", ["orgId"])
+  .index("by_shouldDelete", ["shouldDelete"]),
 
   favorites: defineTable({
     fileId : v.id("files"),

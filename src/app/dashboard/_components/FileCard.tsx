@@ -15,7 +15,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Protect } from '@clerk/nextjs'
-import { FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarHalfIcon, StarIcon, TextIcon, TrashIcon, TypeIcon } from "lucide-react"
+import { FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarHalfIcon, StarIcon, TextIcon, TrashIcon, TypeIcon, UndoIcon } from "lucide-react"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -39,6 +39,7 @@ function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorite
     const toggleFavorite = useMutation(api.files.toggleFavorite)
 
     const deleteFile = useMutation(api.files.deleteFile);
+    const restoreFile = useMutation(api.files.restoreFile);
 
 
     const [isConfirmOpen, setisConfirmOpen] = useState(false)
@@ -50,7 +51,7 @@ function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorite
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete your file.
+                           File will be deleted after 24 hours, You can restore File in Trash
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -61,8 +62,8 @@ function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorite
                             });
                             toast({
                                 variant: "default",
-                                title: "File Deleted",
-                                description: "Your File is Deleted Successfully"
+                                title: "Your File is Marked For Deletion",
+                                description: "Your File will be deleted soon"
                             })
                         }} >Continue</AlertDialogAction>
                     </AlertDialogFooter>
@@ -94,9 +95,24 @@ function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorite
                     >
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => {
-                            setisConfirmOpen(true)
-                        }} className="flex gap-1 text-red-600 items-center cursor-pointer">
-                            <TrashIcon className="w-4 h-4" /> Delete
+                            if(file.shouldDelete){
+                               restoreFile({
+                                fileId : file._id
+                               })
+                            }else{
+                                setisConfirmOpen(true)
+                            }
+                            
+                        }} className="flex gap-1 items-center cursor-pointer">
+                            {file.shouldDelete ?
+                                <div className="flex gap-1 text-green-600 items-center cursor-pointer">
+                                    <UndoIcon className="w-4 h-4" />  Restore
+                                </div>
+                                : <div className="flex gap-1 text-red-600 items-center cursor-pointer">
+                                    <TrashIcon className="w-4 h-4" /> Delete
+                                </div>
+                            }
+
                         </DropdownMenuItem>
                     </Protect>
                 </DropdownMenuContent>
