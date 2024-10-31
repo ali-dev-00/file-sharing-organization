@@ -12,6 +12,14 @@ import { FileCard } from "./FileCard";
 import { DataTable } from "./FileTable"
 import { columns } from "./Coloumns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Doc } from "../../../../convex/_generated/dataModel";
 
 function PlaceHolder() {
   return (
@@ -38,7 +46,7 @@ export function FileBrowser({ title, favoritesOnly, deletedOnly }:
   const organization = useOrganization();
   const user = useUser();
   const [query, setQuery] = useState("")
-
+  const [type, setType] = useState<Doc<"files">["type"] | 'all'>("all")
   let orgId: string | undefined = undefined;
 
   if (organization.isLoaded && user.isLoaded) {
@@ -48,7 +56,13 @@ export function FileBrowser({ title, favoritesOnly, deletedOnly }:
     orgId ? { orgId } : "skip"
   );
   const files = useQuery(
-    api.files.getFiles, orgId ? { orgId, query, favorites: favoritesOnly, deletedOnly } : "skip"
+    api.files.getFiles, orgId ? {
+      orgId,
+      type : type === 'all' ? undefined : type,
+      query,
+      favorites: favoritesOnly,
+      deletedOnly
+    } : "skip"
   );
   const isLoading = files === undefined
 
@@ -62,45 +76,63 @@ export function FileBrowser({ title, favoritesOnly, deletedOnly }:
 
   return (
     <div className="w-full" >
-          <div className="flex justify-between items-center mb-8" >
-            <h1 className="text-4xl font-bold ">{title}</h1>
-            <SearchBar setQuery={setQuery} query={query} />
-            <UploadBtn />
+      <div className="flex justify-between items-center mb-8" >
+        <h1 className="text-4xl font-bold ">{title}</h1>
+        <SearchBar setQuery={setQuery} query={query} />
+        <UploadBtn />
+      </div>
+
+      <Tabs defaultValue="grid">
+        <div className="flex justify-between items-center" >
+          <TabsList className="mb-2">
+            <TabsTrigger value="grid" className="flex gap-2 items-center" >
+              <GridIcon /> Grid
+            </TabsTrigger>
+            <TabsTrigger value="table" className="flex gap-2 items-center">
+              <RowsIcon />  Table
+            </TabsTrigger>
+          </TabsList>
+          <div>
+            <Select value={type} onValueChange={(newType)=>{
+              setType(newType as any)
+            }}>
+              <SelectTrigger className="w-[180px]" defaultValue={"all"}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="image">IMAGE</SelectItem>
+                <SelectItem value="csv">CSV</SelectItem>
+                <SelectItem value="pdf">PDF</SelectItem>
+              </SelectContent>
+            </Select>
+
+          </div>
+        </div>
+        {
+          isLoading &&
+          <div className="mt-12 flex flex-col gap-8 items-center" >
+            <Loader2 className="h-28 w-28 animate-spin text-gray-500" />
+            <div className="text-2xl" >Loading your Files ...</div>
           </div>
 
-          <Tabs defaultValue="grid">
-            <TabsList className="mb-2">
-              <TabsTrigger value="grid" className="flex gap-2 items-center" >
-                <GridIcon /> Grid
-              </TabsTrigger>
-              <TabsTrigger value="table" className="flex gap-2 items-center">
-                <RowsIcon />  Table
-              </TabsTrigger>
-            </TabsList>
-            {
-              isLoading &&
-              <div className="mt-12 flex flex-col gap-8 items-center" >
-                <Loader2 className="h-28 w-28 animate-spin text-gray-500" />
-                <div className="text-2xl" >Loading your Files ...</div>
-              </div>
+        }
+        <TabsContent value="grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {modifiedFiles?.map((file) => {
+              return <FileCard key={file._id} file={file} />;
+            })}
+          </div>
+        </TabsContent>
+        <TabsContent value="table">
+          <DataTable columns={columns} data={modifiedFiles} />
+        </TabsContent>
+      </Tabs>
 
-            }
-            <TabsContent value="grid">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {modifiedFiles?.map((file) => {
-                  return <FileCard key={file._id} file={file} />;
-                })}
-              </div>
-            </TabsContent>
-            <TabsContent value="table">
-              <DataTable columns={columns} data={modifiedFiles} />
-            </TabsContent>
-          </Tabs>
-          
-          {files?.length === 0 &&
-            <PlaceHolder />
-          }
-      
+      {files?.length === 0 &&
+        <PlaceHolder />
+      }
+
     </div>
 
   );

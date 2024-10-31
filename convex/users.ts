@@ -99,12 +99,27 @@ export const updateRoleInOrgForUser = internalMutation({
 
 
 export const getUserProfile = query({
-  args  : {userId : v.id("users")},
-  async handler(ctx,args){
+  args: { userId: v.id("users") },
+  async handler(ctx, args) {
     const user = await ctx.db.get(args.userId);
-    return{
-      name : user?.name,
-      image : user?.image
+    return {
+      name: user?.name,
+      image: user?.image
     }
+  }
+})
+
+export const getMe = query({
+  args: {},
+  async handler(ctx) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+       return null;
+    }
+    const user = await getUser(ctx,identity.tokenIdentifier);
+    if(!user){
+      return null;
+    }
+    return user;
   }
 })
