@@ -36,7 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { format, formatDistance, formatRelative, subDays } from "date-fns";
 
-function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorited: boolean }) {
+export function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorited: boolean }) {
     const { toast } = useToast();
 
     const toggleFavorite = useMutation(api.files.toggleFavorite);
@@ -124,7 +124,7 @@ function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorite
     )
 }
 
-export function FileCard({ file, favorites }: { file: Doc<"files">; favorites: Doc<"favorites">[] }) {
+export function FileCard({ file }: { file: Doc<"files"> & {isFavorited : boolean}}) {
     const typeIcons = {
         image: <ImageIcon />,
         pdf: <FileTextIcon />,
@@ -135,7 +135,7 @@ export function FileCard({ file, favorites }: { file: Doc<"files">; favorites: D
 
     const fileWithUrl = fileUrl?.find(f => f.fileId === file.fileId);
 
-    const isFavorited = favorites.some((favorite) => favorite.fileId === file._id)
+   
     const userProfile = useQuery(api.users.getUserProfile, {
         userId: file.userId,
     });
@@ -147,7 +147,7 @@ export function FileCard({ file, favorites }: { file: Doc<"files">; favorites: D
                     {typeIcons[file.type]} {file.name}
                 </CardTitle>
                 <div className="absolute top-2 right-2">
-                    <FileCardActions isFavorited={isFavorited} file={file} />
+                    <FileCardActions isFavorited={file.isFavorited} file={file} />
                 </div>
             </CardHeader>
             <CardContent className="h-[150px] flex justify-center items-center ">
