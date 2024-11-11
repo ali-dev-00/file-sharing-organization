@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { OrganizationSwitcher, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { DoorOpenIcon, SquareArrowRight } from "lucide-react";
+import { OrganizationSwitcher, SignedIn, SignedOut,  UserButton } from "@clerk/nextjs";
+import {  SquareArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 

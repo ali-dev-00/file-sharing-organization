@@ -5,7 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { UploadBtn } from "./UploadBtn";
 import Image from "next/image";
-import { GridIcon, Loader2, RowsIcon, TableIcon } from "lucide-react";
+import { GridIcon, Loader2, RowsIcon } from "lucide-react";
 import { SearchBar } from "@/app/dashboard/_components/SearchBar";
 import { useState } from "react";
 import { FileCard } from "./FileCard";

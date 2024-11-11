@@ -8,7 +8,6 @@ import { z } from "zod";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -77,6 +76,7 @@ export function UploadBtn() {
                 description: "Now everyone can view your file"
             })
         } catch (error) {
+            console.log("Error uploading",error)
             toast({
                 variant: "destructive",
                 title: "Something went wrong",

@@ -5,7 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Doc, Id } from "../../../../convex/_generated/dataModel";
+import { Doc } from "../../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -17,7 +17,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Protect } from '@clerk/nextjs'
-import { DownloadIcon, FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarHalfIcon, StarIcon, TextIcon, TrashIcon, TypeIcon, UndoIcon } from "lucide-react"
+import { DownloadIcon, FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarHalfIcon, StarIcon, TrashIcon, UndoIcon } from "lucide-react"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -29,12 +29,11 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useState } from "react";
-import { ReactNode } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import { format, formatDistance, formatRelative, subDays } from "date-fns";
+import { formatRelative } from "date-fns";
 
 export function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isFavorited: boolean }) {
     const { toast } = useToast();
@@ -94,13 +93,13 @@ export function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isF
                     </DropdownMenuItem>
 
                     <Protect
-                       condition={(check)=>{
-                        return check({
-                            role: "org:admin",
-                        }) 
-                       }}
+                        condition={(check) =>
+                            check({ role: "org:admin" }) || file.userId === me?._id
+                        }
                         fallback={<></>}
                     >
+
+
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => {
                             if (file.shouldDelete) {
@@ -129,7 +128,7 @@ export function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isF
     )
 }
 
-export function FileCard({ file }: { file: Doc<"files"> & {isFavorited : boolean}}) {
+export function FileCard({ file }: { file: Doc<"files"> & { isFavorited: boolean } }) {
     const typeIcons = {
         image: <ImageIcon />,
         pdf: <FileTextIcon />,
@@ -140,7 +139,7 @@ export function FileCard({ file }: { file: Doc<"files"> & {isFavorited : boolean
 
     const fileWithUrl = fileUrl?.find(f => f.fileId === file.fileId);
 
-   
+
     const userProfile = useQuery(api.users.getUserProfile, {
         userId: file.userId,
     });
@@ -149,15 +148,15 @@ export function FileCard({ file }: { file: Doc<"files"> & {isFavorited : boolean
         <Card>
 
             <CardHeader className="">
-            <div className="flex w-full justify-between items-center" >
-                <CardTitle className=" flex items-center text-base font-bold">
-                    {typeIcons[file.type]} {file.name}
-                </CardTitle>
-                <div className="">
-                    <FileCardActions isFavorited={file.isFavorited} file={file} />
+                <div className="flex w-full justify-between items-center" >
+                    <CardTitle className=" flex items-center text-base font-bold">
+                        {typeIcons[file.type]} {file.name}
+                    </CardTitle>
+                    <div className="">
+                        <FileCardActions isFavorited={file.isFavorited} file={file} />
+                    </div>
                 </div>
-            </div>
-            
+
             </CardHeader>
 
             <CardContent className="h-[150px] flex justify-center items-center ">
