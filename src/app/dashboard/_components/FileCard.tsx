@@ -97,7 +97,7 @@ export function FileCardActions({ file, isFavorited }: { file: Doc<"files">, isF
                        condition={(check)=>{
                         return check({
                             role: "org:admin",
-                        }) || file.userId === me?._id
+                        }) 
                        }}
                         fallback={<></>}
                     >

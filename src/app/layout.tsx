@@ -5,6 +5,7 @@ import { ConvexClientProvider } from "./ConvexClienProvider";
 import Header from "./Header";
 import { Toaster } from "@/components/ui/toaster";
 
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
           <Toaster/>
           <Header/>
         {children}
+    
    
         </ConvexClientProvider>
        
