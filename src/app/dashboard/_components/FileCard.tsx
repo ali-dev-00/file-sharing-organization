@@ -147,14 +147,19 @@ export function FileCard({ file }: { file: Doc<"files"> & {isFavorited : boolean
 
     return (
         <Card>
-            <CardHeader className="relative">
-                <CardTitle className="flex gap-2 text-base font-bold">
+
+            <CardHeader className="">
+            <div className="flex w-full justify-between items-center" >
+                <CardTitle className=" flex items-center text-base font-bold">
                     {typeIcons[file.type]} {file.name}
                 </CardTitle>
-                <div className="absolute top-2 right-2">
+                <div className="">
                     <FileCardActions isFavorited={file.isFavorited} file={file} />
                 </div>
+            </div>
+            
             </CardHeader>
+
             <CardContent className="h-[150px] flex justify-center items-center ">
                 {fileWithUrl && file.type === 'image' && (
                     <Image

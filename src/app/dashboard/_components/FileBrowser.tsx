@@ -77,7 +77,7 @@ export function FileBrowser({ title, favoritesOnly, deletedOnly }:
   return (
     <div className="w-full" >
       <div className="flex justify-between items-center mb-8" >
-        <h1 className="text-4xl font-bold ">{title}</h1>
+        <h1 className="main-heading text-4xl font-bold ">{title}</h1>
         <SearchBar setQuery={setQuery} query={query} />
         <UploadBtn />
       </div>

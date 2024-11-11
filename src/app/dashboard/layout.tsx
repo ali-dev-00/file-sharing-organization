@@ -16,12 +16,12 @@ export default function DashboardLayout({
 }>) {
   return (
     <div className="container mx-auto pt-12 ">
-    <div className="flex gap-8">
-      <div className="w-36 flex flex-col gap-4 " >
+    <div className="main-layout flex gap-8">
+      <div className="section-1 w-36 flex flex-col gap-4 " >
        <SideNav/>
       </div>
 
-      <div className="w-full" >
+      <div className="section-2 w-full" >
         {children}
        </div>
     </div>

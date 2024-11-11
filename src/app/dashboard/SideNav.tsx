@@ -10,7 +10,7 @@ export function SideNav(){
 
   const pathname =   usePathname()
     return(
-        <div>
+        <div className="side-nav">
          <Link href="/dashboard/files">  
           <Button variant="link" className={clsx("flex gap-2" ,{
             'text-blue-500' : pathname.includes("/dashboard/files")

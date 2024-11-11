@@ -16,8 +16,8 @@ export default function Header() {
                     </Link>
                 </div>
                 <SignedIn>
-                    <Link href="/dashboard/files">
-                        <Button variant="outline" >
+                    <Link href="/dashboard/files" className="mid-heading" > 
+                        <Button variant="outline">
                             Start Managing Files <SquareArrowRight />
                         </Button>
                     </Link>
