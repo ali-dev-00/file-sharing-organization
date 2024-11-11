@@ -16,23 +16,20 @@ export default function Header() {
                     </Link>
                 </div>
                 <SignedIn>
-                    <Link href="/dashboard/files" className="mid-heading" > 
+                    <Link href="/dashboard/files" className="mid-heading" >
                         <Button variant="outline">
                             Start Managing Files <SquareArrowRight />
                         </Button>
                     </Link>
                 </SignedIn>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-4">
+                <SignedIn>
                     <OrganizationSwitcher />
                     <UserButton />
+                </SignedIn>
                     <SignedOut>
-                        <SignInButton>
-                            <Button>
-                                Sign In
-                            </Button>
-                        </SignInButton>
+                        
                     </SignedOut>
-
                 </div>
 
             </div>

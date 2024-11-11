@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClienProvider";
-import Header from "./Header";
+import Header from "./_components/Header";
 import { Toaster } from "@/components/ui/toaster";
 
 
